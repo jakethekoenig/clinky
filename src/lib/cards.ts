@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
-import { join, basename, extname } from 'path';
+import { join, basename, extname, isAbsolute } from 'path';
 import type { Card } from '../types.js';
 import { getClinkyHome } from './config.js';
 
@@ -83,8 +83,8 @@ export function getCardByPath(cardPath: string): Card | null {
   const clinkyHome = getClinkyHome();
   let fullPath: string;
 
-  // If path is absolute, use it directly
-  if (cardPath.startsWith('/')) {
+  // If path is absolute, use it directly (cross-platform)
+  if (isAbsolute(cardPath)) {
     fullPath = cardPath;
   } else {
     // Treat as relative to CLINKY_HOME

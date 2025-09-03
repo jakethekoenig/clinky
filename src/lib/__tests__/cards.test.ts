@@ -117,5 +117,19 @@ Test back`;
       
       process.env.CLINKY_HOME = originalEnv;
     });
+    
+    it('should handle absolute paths on Windows', () => {
+      const cardContent = `Test front
+<!---split--->
+Test back`;
+      
+      const cardPath = join(testDir, 'test.txt');
+      writeFileSync(cardPath, cardContent);
+      
+      // Test with Windows-style absolute path
+      const result = getCardByPath(cardPath);
+      expect(result).not.toBe(null);
+      expect(result!.name).toBe('test');
+    });
   });
 });

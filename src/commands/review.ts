@@ -83,11 +83,13 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
         continue;
       }
 
-      const shouldContinue = await reviewCard(card.name, rl);
-      if (!shouldContinue) {
+      const result = await reviewCard(card.name, rl);
+      if (!result.continue) {
         break;
       }
-      reviewedCount++;
+      if (result.reviewed) {
+        reviewedCount++;
+      }
     }
   } finally {
     rl.close();
@@ -104,9 +106,12 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
   }
 }
 
-async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
+async function reviewCard(
+  cardName: string,
+  rl: Interface
+): Promise<{ continue: boolean; reviewed: boolean }> {
   const card = getCard(cardName);
-  if (!card) return true;
+  if (!card) return { continue: true, reviewed: false };
 
   console.log(`\n--- Card: ${cardName} ---`);
   console.log(card.front);
@@ -117,12 +122,12 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
   const frontResponse = await question(rl, '> ');
 
   if (frontResponse.toLowerCase() === 'q') {
-    return false;
+    return { continue: false, reviewed: false };
   }
 
   if (frontResponse.toLowerCase() === 'edit') {
     await editCard(card.filePath);
-    return true;
+    return { continue: true, reviewed: false };
   }
 
   // Show back of card
@@ -141,12 +146,12 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
     const backResponse = await question(rl, '> ');
 
     if (backResponse.toLowerCase() === 'q') {
-      return false;
+      return { continue: false, reviewed: false };
     }
 
     if (backResponse.toLowerCase() === 'edit') {
       await editCard(card.filePath);
-      return true;
+      return { continue: true, reviewed: false };
     }
 
     const score = parseReviewScore(backResponse);
@@ -167,7 +172,7 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
       const nextReviewDate = newSchedule.nextReview.toLocaleDateString();
       console.log(`Card scheduled for next review: ${nextReviewDate}`);
 
-      return true;
+      return { continue: true, reviewed: true };
     }
 
     console.log(
