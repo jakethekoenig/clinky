@@ -35,6 +35,8 @@ Back of the card
 % Lines starting with % are comments and ignored by clinky when printing for review.
 ```
 
+Note: when you run `clinky new`, the editor will open with a template that already has the split line and comment line. The user can edit the front and back of the card as needed.
+
 ### Review Data
 
 Review data is stored in an sqlite database at CLINKY_HOME/reviews.db.
@@ -43,7 +45,7 @@ Possible schema for the reviews table:
 
 ```sql
 CREATE TABLE reviews (
-    card_path TEXT NOT NULL, -- path to the card file relative to CLINKY_HOME/cards/
+    card_name TEXT NOT NULL, -- name of the card file. Note it's not the path. Cards must have unique names and moving them doesn't affect the review data.
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- when the card was reviewed
     score INTEGER NOT NULL,
 );
@@ -53,11 +55,9 @@ This is sufficient to implement a basic spaced repetition algorithm like SM-2.
 
 ### Configuration
 
-Clinky can be configured via a config file at CLINKY_HOME/config.json. Possible configuration options:
+Clinky can be configured via a config file at CLINKY_HOME/config.json. Starting configuration options:
 ```json
 {
-    "editor": "vim", // default editor to use for creating/editing cards
-    "review_limit": 20 // maximum number of cards to review in a single session
     "auto_pull": true // whether to automatically pull from git before starting a review session
     "auto_push": true // whether to automatically push to git after finishing a review session or creating a card
 }
@@ -80,9 +80,11 @@ Automatically pulls changes from the remote repository before starting a review 
 
 Lets:
 * Use typescript/bun
+    * You can decide which libraries to use.
 * Use sqlite for review data
 * Setup github actions which check formatting/lint
 * Write comprehensive tests
 * Some of those tests should be e2e tests which run the cli commands and check the output
     * They should even be some tests that use git and sqlite
 * Be sure to make a gitignore for artifacts that shouldn't end up in git
+* After implementing all this update the README with instructions on how to use the program
