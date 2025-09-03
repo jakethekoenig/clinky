@@ -6,6 +6,8 @@ import { Database } from 'bun:sqlite';
 
 const TEST_CLINKY_HOME = './test_clinky_home';
 process.env.CLINKY_HOME = TEST_CLINKY_HOME;
+// This will initialize the database
+import '../src/db';
 const TEST_CARDS_DIR = path.join(TEST_CLINKY_HOME, 'cards');
 
 const runClinky = (args: string[], options: { env?: NodeJS.ProcessEnv; input?: string } = {}) => {
@@ -57,7 +59,11 @@ describe('E2E Tests', () => {
     const db = new Database(path.join(TEST_CLINKY_HOME, 'reviews.db'));
     const pastDate = new Date();
     pastDate.setDate(pastDate.getDate() - 1);
-    db.run('INSERT INTO cards (path, due_date) VALUES (?, ?)', [cardPath, pastDate.toISOString()]);
+    const cardName = path.basename(cardPath);
+    db.run(
+      'INSERT INTO cards (card_name, due_date, interval, easiness_factor) VALUES (?, ?, ?, ?)',
+      [cardName, pastDate.toISOString(), 1, 2.5]
+    );
     db.close();
 
     const proc = runClinky(['review', '--non-interactive']);
