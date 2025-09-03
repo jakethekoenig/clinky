@@ -30,6 +30,7 @@ describe("e2e: new card with git sync", () => {
     const res = spawnSync("bun", ["run", "clinky", "new"], {
       cwd: process.cwd(),
       encoding: "utf8",
+      env: { ...process.env, CLINKY_HOME: tmp, EDITOR: editorScript },
     });
     expect(res.status).toBe(0);
 
