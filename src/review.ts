@@ -58,52 +58,67 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
 
     // Show front
     console.log("-----");
-    console.log(card.front || "(empty front)");
-    const before = await ask("\nPress Enter to show the back (q=quit, e=edit)... ");
-    if (before.trim().toLowerCase() === "q") {
-      break;
-    }
-    if (before.trim().toLowerCase() === "e") {
-      const editRes = openEditor(filePath);
-      if (!editRes.ok) {
-        console.error(editRes.message || "Failed to open editor");
+    while (true) {
+      const current = readCard(filePath);
+      console.log(current.front || "(empty front)");
+      const before = await ask("\nPress Enter to show the back (q=quit, e=edit)... ");
+      const cmd = before.trim().toLowerCase();
+      if (cmd === "q") {
         break;
       }
-      // re-read updated card front before showing back
-    }
-    console.log("\n" + (readCard(filePath).back || "(empty back)"));
-
-    // Ask for rating (1 easiest .. 4 hardest/again). Allow edit/quit here too.
-    let ratingInput = await ask(
-      "\nRate your recall: 1=easy, 2=medium, 3=hard, 4=again (e=edit, q=quit) > ",
-    );
-    ratingInput = ratingInput.trim().toLowerCase();
-
-    if (ratingInput === "q") {
+      if (cmd === "e") {
+        const editRes = openEditor(filePath);
+        if (!editRes.ok) {
+          console.error(editRes.message || "Failed to open editor");
+          break;
+        }
+        // loop back to reprint updated front
+        continue;
+      }
+      // Enter pressed: proceed to show back
+      console.log("\n" + (readCard(filePath).back || "(empty back)"));
       break;
     }
-    if (ratingInput === "e") {
-      const editRes = openEditor(filePath);
-      if (!editRes.ok) {
-        console.error(editRes.message || "Failed to open editor");
-        break;
-      }
-      // after edit, fall through to ask rating again
-      ratingInput = await ask("\nRate your recall: 1=easy, 2=medium, 3=hard, 4=again (q=quit) > ");
+    if (false) {
+      /* placeholder to satisfy structure */
+    }
+
+    // Ask for rating (1 easiest .. 4 hardest/again). Allow multiple edits/quit here too.
+    let rating: Rating | undefined;
+    while (!rating) {
+      let ratingInput = await ask(
+        "\nRate your recall: 1=easy, 2=medium, 3=hard, 4=again (e=edit, q=quit) > ",
+      );
       ratingInput = ratingInput.trim().toLowerCase();
-      if (ratingInput === "q") break;
-    }
 
-    const mapNum: Record<string, Rating> = {
-      "1": "easy",
-      "2": "medium",
-      "3": "hard",
-      "4": "again",
-    };
-    const rating = mapNum[ratingInput];
+      if (ratingInput === "q") {
+        break;
+      }
+      if (ratingInput === "e") {
+        const editRes = openEditor(filePath);
+        if (!editRes.ok) {
+          console.error(editRes.message || "Failed to open editor");
+          break;
+        }
+        // loop to allow further edits or rating
+        continue;
+      }
+
+      const mapNum: Record<string, Rating> = {
+        "1": "easy",
+        "2": "medium",
+        "3": "hard",
+        "4": "again",
+      };
+      const maybe = mapNum[ratingInput];
+      if (!maybe) {
+        console.log("Invalid input. Use 1,2,3,4 (or e to edit, q to quit).");
+        continue;
+      }
+      rating = maybe;
+    }
     if (!rating) {
-      console.log("Invalid input, skipping card.");
-      continue;
+      break;
     }
 
     const state = db.getState(name);
