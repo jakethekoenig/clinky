@@ -1,6 +1,9 @@
 import { expect, test, describe, mock, beforeEach, afterEach, spyOn } from 'bun:test';
 import fs from 'fs';
 import path from 'path';
+
+process.env.CLINKY_HOME = './test_clinky_home_unit';
+
 import * as srs from '../src/srs';
 import { getDueCards } from '../src/commands/review';
 import * as config from '../src/config';

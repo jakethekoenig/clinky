@@ -21,8 +21,5 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Run tests
-        run: bun test --coverage
-
-      - name: Check coverage
-        run: bun run scripts/check-coverage.js
+      - name: Run tests and check coverage
+        run: bun test --coverage && bun run scripts/check-coverage.js
