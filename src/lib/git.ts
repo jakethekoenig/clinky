@@ -1,4 +1,4 @@
-import { execSync, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { getClinkyHome } from './config.js';
@@ -17,7 +17,13 @@ export function gitPull(): boolean {
 
   try {
     const clinkyHome = getClinkyHome();
-    execSync('git pull', { cwd: clinkyHome, stdio: 'pipe' });
+    const pullResult = spawnSync('git', ['pull'], {
+      cwd: clinkyHome,
+      stdio: 'pipe',
+    });
+    if (pullResult.status !== 0) {
+      throw new Error(`git pull failed: ${pullResult.stderr?.toString()}`);
+    }
     return true;
   } catch (error) {
     console.error('Git pull failed:', error);
@@ -31,16 +37,19 @@ export function gitCommitAndPush(message: string): boolean {
   try {
     const clinkyHome = getClinkyHome();
 
-    // Check if there are any changes to commit
-    try {
-      execSync('git diff --quiet && git diff --cached --quiet', {
-        cwd: clinkyHome,
-        stdio: 'pipe',
-      });
+    // Check if there are any changes to commit using git status
+    const statusResult = spawnSync('git', ['status', '--porcelain'], {
+      cwd: clinkyHome,
+      stdio: 'pipe',
+    });
+    if (statusResult.status !== 0) {
+      throw new Error(`git status failed: ${statusResult.stderr?.toString()}`);
+    }
+
+    const output = statusResult.stdout?.toString().trim();
+    if (!output) {
       // No changes to commit
       return true;
-    } catch {
-      // There are changes, proceed with commit
     }
 
     // Use spawnSync to avoid command injection vulnerabilities
@@ -79,12 +88,17 @@ export function hasUncommittedChanges(): boolean {
 
   try {
     const clinkyHome = getClinkyHome();
-    execSync('git diff --quiet && git diff --cached --quiet', {
+    const statusResult = spawnSync('git', ['status', '--porcelain'], {
       cwd: clinkyHome,
       stdio: 'pipe',
     });
-    return false;
+    if (statusResult.status !== 0) {
+      return false;
+    }
+
+    const output = statusResult.stdout?.toString().trim();
+    return !!output;
   } catch {
-    return true;
+    return false;
   }
 }

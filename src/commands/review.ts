@@ -14,6 +14,7 @@ import {
   parseReviewScore,
 } from '../lib/spaced-repetition.js';
 import { gitPull, gitCommitAndPush } from '../lib/git.js';
+import { closeDatabase } from '../lib/database.js';
 
 export async function reviewCommand(cardPath?: string): Promise<void> {
   ensureClinkyHome();
@@ -104,6 +105,9 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
       console.warn('Failed to push changes to git');
     }
   }
+
+  // Clean up database connection
+  closeDatabase();
 }
 
 async function reviewCard(

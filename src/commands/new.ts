@@ -4,6 +4,7 @@ import { basename, relative } from 'path';
 import { ensureClinkyHome, getConfig, getClinkyHome } from '../lib/config.js';
 import { createCardTemplate, getCardPath, saveCard } from '../lib/cards.js';
 import { gitPull, gitCommitAndPush } from '../lib/git.js';
+import { closeDatabase } from '../lib/database.js';
 
 export async function newCommand(): Promise<void> {
   ensureClinkyHome();
@@ -36,7 +37,7 @@ export async function newCommand(): Promise<void> {
     stdio: 'inherit',
   });
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     editorProcess.on('close', async (code) => {
       if (code !== 0) {
         console.error(`Editor exited with code ${code}`);
@@ -70,5 +71,8 @@ export async function newCommand(): Promise<void> {
       console.error('Failed to start editor:', error);
       reject(error);
     });
+  }).finally(() => {
+    // Clean up database connection
+    closeDatabase();
   });
 }
