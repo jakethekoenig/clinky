@@ -1,7 +1,85 @@
 # Clinky
 
-Vision: a cli spaced repetition program
-Minimal features e.g. it will be byo editor and search tool. Cards will be plain text. Users can use git for history and sync.
+A CLI spaced repetition program with minimal features. Cards are plain text files, and you can use git for history and sync.
+
+## Installation
+
+### Prerequisites
+
+- [Bun](https://bun.sh) runtime (install with `curl -fsSL https://bun.sh/install | bash`)
+
+### Install from source
+
+```bash
+git clone https://github.com/jakethekoenig/clinky.git
+cd clinky
+bun install
+bun link
+```
+
+Now you can use `clinky` from anywhere in your terminal.
+
+## Usage
+
+### Create a new card
+
+```bash
+clinky new
+```
+
+This opens your default editor (or vim) to create a new card. The card template has a front and back separated by `<!---split--->`.
+
+### Review cards
+
+```bash
+clinky review
+```
+
+Reviews all due cards using a spaced repetition algorithm (SM-2).
+
+```bash
+clinky review path/to/specific/card.txt
+```
+
+Reviews a specific card.
+
+### Configuration
+
+Clinky stores data in `~/.config/clinky/` by default. You can override this with the `CLINKY_HOME` environment variable.
+
+The `config.json` file supports:
+
+- `auto_pull`: Automatically pull from git before operations (default: true)
+- `auto_push`: Automatically push to git after operations (default: true)
+
+### Git Sync
+
+To enable git sync:
+
+1. Initialize a git repository in your CLINKY_HOME directory
+2. Add a remote repository
+3. Set `auto_pull` and `auto_push` to true in config.json
+
+## Development
+
+### Run tests
+
+```bash
+bun test
+```
+
+### Run linting and formatting
+
+```bash
+bun run lint
+bun run format
+```
+
+### Type checking
+
+```bash
+bun run typecheck
+```
 
 # Full Spec
 
@@ -16,7 +94,8 @@ Opens an editor to create a new card. Uses the EDITOR environment variable to de
 Starts a review session for due cards. Prints the front of the card to the cli and prompts the user to press enter to see the back of the card. After showing the back of the card, prompts the user to rate their recall, easy, medium, hard, again. Updates the card's review schedule based on the user's rating. Can also enter e to edit the card and q to quit (before or after seeing the back).
 
 Arguments:
-* path: Optional path to a specific card to review relative to CLINKY_HOME. If not provided, reviews all due cards in CLINKY_HOME.
+
+- path: Optional path to a specific card to review relative to CLINKY_HOME. If not provided, reviews all due cards in CLINKY_HOME.
 
 ## Storage & Format
 
@@ -27,6 +106,7 @@ Clinky data is stored under `~/.config/clinky/` by default, this can be overridd
 Cards are stored under CLINKY_HOME/cards/. The user can use directories to organize them into decks if desired.
 
 Each card is a plain text file with the following format:
+
 ```
 Front of the card
 Can be multiple lines
@@ -56,6 +136,7 @@ This is sufficient to implement a basic spaced repetition algorithm like SM-2.
 ### Configuration
 
 Clinky can be configured via a config file at CLINKY_HOME/config.json. Starting configuration options:
+
 ```json
 {
     "auto_pull": true // whether to automatically pull from git before starting a review session
@@ -75,16 +156,16 @@ Automatically commits and pushes changes to the remote repository after creating
 
 Automatically pulls changes from the remote repository before starting a review session. And before creating a card. If there are merge conflicts, clinky should abort the operation and inform the user to resolve the conflicts manually.
 
-
 ## Tech decisions
 
 Lets:
-* Use typescript/bun
-    * You can decide which libraries to use.
-* Use sqlite for review data
-* Setup github actions which check formatting/lint
-* Write comprehensive tests
-* Some of those tests should be e2e tests which run the cli commands and check the output
-    * They should even be some tests that use git and sqlite
-* Be sure to make a gitignore for artifacts that shouldn't end up in git
-* After implementing all this update the README with instructions on how to use the program
+
+- Use typescript/bun
+  - You can decide which libraries to use.
+- Use sqlite for review data
+- Setup github actions which check formatting/lint
+- Write comprehensive tests
+- Some of those tests should be e2e tests which run the cli commands and check the output
+  - They should even be some tests that use git and sqlite
+- Be sure to make a gitignore for artifacts that shouldn't end up in git
+- After implementing all this update the README with instructions on how to use the program
