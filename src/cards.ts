@@ -28,7 +28,7 @@ export function readCard(path: string): Card {
       .split("\n")
       .filter((l) => !l.trimStart().startsWith("%"))
       .join("\n")
-      .trimEnd();
+      .trim();
   const front = clean(frontRaw ?? "");
   const back = clean(backRaw ?? "");
   const name = path.split("/").pop()!;
@@ -37,7 +37,7 @@ export function readCard(path: string): Card {
 
 export function openEditor(filePath: string): void {
   const editor = process.env.EDITOR?.trim() || "vim";
-  const res = spawnSync(editor, [filePath], { stdio: "inherit" });
+  const res = spawnSync(editor, [filePath], { stdio: "ignore" });
   if (res.status !== 0) {
     throw new Error(`Editor exited with status ${res.status}`);
   }
