@@ -49,9 +49,13 @@ describe('E2E Tests', () => {
   test('clinky review - should start a session with due cards', () => {
     // Create a card that is due
     fs.writeFileSync(path.join(TEST_CARDS_DIR, 'due_card.txt'), 'Front<!---split--->Back');
+    
+    console.log('Files in test cards dir:', fs.readdirSync(TEST_CARDS_DIR));
 
     const proc = runClinky(['review', '--non-interactive']);
     const output = proc.stdout.toString();
+    console.log('STDOUT:', output);
+    console.log('STDERR:', proc.stderr.toString());
     expect(output).toContain('Starting review session for 1 card(s)');
     expect(output).toContain('Quitting review session.');
   });
