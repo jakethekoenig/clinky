@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { spawnSync } from "child_process";
+import { spawnSync, execSync } from "child_process";
 import { ensureHomeLayout, getHomeDir } from "./config";
 import type { Card } from "./types";
 
@@ -63,7 +63,6 @@ Back of the card
 export function listAllCardPaths(): string[] {
   // Traverse cards directory recursively
   const dir = cardsDir();
-  const { execSync } = await import("child_process");
   try {
     const out = execSync(`find "${dir}" -type f -name "*.txt"`, {
       encoding: "utf8",
