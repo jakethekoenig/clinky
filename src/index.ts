@@ -23,6 +23,7 @@ program
   .command('review')
   .description('Review due cards')
   .argument('[path]', 'Optional path to a specific card to review')
+  .option('--non-interactive', 'Run in non-interactive mode for testing', false)
   .action(review);
 
 program.parse(process.argv);
