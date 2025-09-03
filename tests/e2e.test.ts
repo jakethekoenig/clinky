@@ -2,6 +2,7 @@ import { expect, test, describe, beforeEach, afterEach } from 'bun:test';
 import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'bun';
+import { Database } from 'bun:sqlite';
 
 const TEST_CLINKY_HOME = './test_clinky_home';
 process.env.CLINKY_HOME = TEST_CLINKY_HOME;
@@ -49,7 +50,15 @@ describe('E2E Tests', () => {
 
   test('clinky review - should start a session with due cards', () => {
     // Create a card that is due
-    fs.writeFileSync(path.join(TEST_CARDS_DIR, 'due_card.txt'), 'Front<!---split--->Back');
+    const cardPath = path.join(TEST_CARDS_DIR, 'due_card.txt');
+    fs.writeFileSync(cardPath, 'Front<!---split--->Back');
+
+    // Manually add SRS data to make it due
+    const db = new Database(path.join(TEST_CLINKY_HOME, 'reviews.db'));
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - 1);
+    db.run('INSERT INTO cards (path, due_date) VALUES (?, ?)', [cardPath, pastDate.toISOString()]);
+    db.close();
 
     const proc = runClinky(['review', '--non-interactive']);
     const output = proc.stdout.toString();
