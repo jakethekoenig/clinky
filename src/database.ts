@@ -4,7 +4,7 @@ import { getClinkyHome, ensureClinkyHome } from './config';
 
 export interface Review {
   card_name: string;
-  created_at: string;
+  created_at: number; // Julian day as REAL from SQLite
   score: number;
 }
 

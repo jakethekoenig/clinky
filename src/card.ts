@@ -74,48 +74,64 @@ export function getAllCards(): Card[] {
   return cards;
 }
 
-// Simple SM-2 algorithm implementation
-export function calculateNextReview(reviews: Review[], score: Score): Date {
-  const now = new Date();
+// Convert Julian day to milliseconds since Unix epoch
+export function julianToMs(julianDay: number): number {
+  return (julianDay - 2440587.5) * 86400000;
+}
 
-  if (reviews.length === 0) {
-    // First review
-    switch (score) {
-      case Score.AGAIN:
-        return new Date(now.getTime() + 1 * 60 * 1000); // 1 minute
-      case Score.HARD:
-        return new Date(now.getTime() + 10 * 60 * 1000); // 10 minutes
-      case Score.MEDIUM:
-        return new Date(now.getTime() + 24 * 60 * 60 * 1000); // 1 day
-      case Score.EASY:
-        return new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000); // 4 days
-    }
-  }
-
-  // Calculate interval based on previous reviews
-  const lastReview = reviews[0];
-  const lastInterval =
-    reviews.length > 1
-      ? new Date(lastReview.created_at).getTime() - new Date(reviews[1].created_at).getTime()
-      : 24 * 60 * 60 * 1000; // Default to 1 day
-
-  let newInterval: number;
+// Get initial interval based on score
+function getInitialInterval(score: Score): number {
   switch (score) {
     case Score.AGAIN:
-      newInterval = 1 * 60 * 1000; // Reset to 1 minute
-      break;
+      return 1 * 60 * 1000; // 1 minute
     case Score.HARD:
-      newInterval = lastInterval * 1.2;
-      break;
+      return 10 * 60 * 1000; // 10 minutes
     case Score.MEDIUM:
-      newInterval = lastInterval * 2.5;
-      break;
+      return 24 * 60 * 60 * 1000; // 1 day
     case Score.EASY:
-      newInterval = lastInterval * 3.5;
-      break;
+      return 4 * 24 * 60 * 60 * 1000; // 4 days
+  }
+}
+
+// Scale interval based on score
+function scaleInterval(prevInterval: number, score: Score): number {
+  switch (score) {
+    case Score.AGAIN:
+      return 1 * 60 * 1000; // Reset to 1 minute
+    case Score.HARD:
+      return prevInterval * 1.2;
+    case Score.MEDIUM:
+      return prevInterval * 2.5;
+    case Score.EASY:
+      return prevInterval * 3.5;
+  }
+}
+
+// Simple SM-2 algorithm implementation
+export function calculateNextReview(reviews: Review[]): Date {
+  if (reviews.length === 0) {
+    // No reviews yet, card is due now
+    return new Date();
   }
 
-  return new Date(now.getTime() + newInterval);
+  const lastReview = reviews[0];
+  const lastReviewMs = julianToMs(lastReview.created_at);
+  const lastScore = lastReview.score as Score;
+
+  let newInterval: number;
+
+  if (reviews.length === 1) {
+    // First review, use initial interval
+    newInterval = getInitialInterval(lastScore);
+  } else {
+    // Calculate interval based on previous reviews
+    const prevReview = reviews[1];
+    const prevReviewMs = julianToMs(prevReview.created_at);
+    const lastInterval = lastReviewMs - prevReviewMs;
+    newInterval = scaleInterval(lastInterval, lastScore);
+  }
+
+  return new Date(lastReviewMs + newInterval);
 }
 
 export function getDueCards(): Card[] {
@@ -131,10 +147,7 @@ export function getDueCards(): Card[] {
       return true;
     }
 
-    const lastReview = reviews[0];
-    const lastScore = lastReview.score as Score;
-    const nextReviewDate = calculateNextReview(reviews.slice(1), lastScore);
-
+    const nextReviewDate = calculateNextReview(reviews);
     return nextReviewDate <= now;
   });
 

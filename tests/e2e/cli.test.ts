@@ -67,14 +67,14 @@ describe('Clinky CLI E2E', () => {
     expect(config.auto_push).toBe(true);
   });
 
-  test('database should be created on review', () => {
+  test('database should be created on review', async () => {
     // Create a test card first
     const cardsDir = join(tempDir, 'cards');
     mkdirSync(cardsDir, { recursive: true });
     writeFileSync(join(cardsDir, 'test.txt'), 'Front\n<!---split--->\nBack');
 
     // Import the database directly to test it
-    const ReviewDatabase = require('../../src/database').default;
+    const { default: ReviewDatabase } = await import('../../src/database');
     const db = new ReviewDatabase();
     db.close();
 
