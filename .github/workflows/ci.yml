@@ -19,4 +19,4 @@ jobs:
         run: bun install
 
       - name: Run tests
-        run: bun test
+        run: bun test --coverage --min-coverage=47.77
