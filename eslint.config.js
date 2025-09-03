@@ -52,6 +52,14 @@ export default [
       },
     },
   },
+  {
+    files: ["scripts/**/*.js"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
   // Disable rules that conflict with Prettier
   prettier,
 ];

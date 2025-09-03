@@ -28,7 +28,7 @@ function parseSummary(output) {
   const lines = output.split("\n");
   const headerIdx = lines.findIndex((l) => l.includes("% Stmts") && l.includes("% Lines"));
   if (headerIdx === -1) throw new Error("Could not find coverage summary header");
-  const allLine = lines.slice(headerIdx).find((l) => l.startsWith("All files"));
+  const allLine = lines.slice(headerIdx).find((l) => l.trimStart().startsWith("All files"));
   if (!allLine) throw new Error("Could not find 'All files' coverage summary");
   const cols = allLine.split("|").map((s) => s.trim());
   // cols: ["All files", "85.71", "50", "50", "85.71", ...] or with % signs
