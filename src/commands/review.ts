@@ -28,6 +28,7 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
       console.error(
         'Failed to pull changes. Please resolve conflicts manually.'
       );
+      closeDatabase();
       process.exit(1);
     }
   }
@@ -40,6 +41,7 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
     const { name, card } = resolveCardArgument(cardPath);
     if (!card) {
       console.error(`Card not found: ${cardPath}`);
+      closeDatabase();
       process.exit(1);
     }
     cardsToReview = [name];
@@ -69,6 +71,7 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
 
   if (cardsToReview.length === 0) {
     console.log('No cards due for review!');
+    closeDatabase();
     return;
   }
 

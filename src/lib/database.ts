@@ -3,7 +3,7 @@ import { join } from 'path';
 import type { Review, CardSchedule } from '../types.js';
 import { getClinkyHome } from './config.js';
 
-type DatabaseInstance = ReturnType<typeof Database>;
+type DatabaseInstance = InstanceType<typeof Database>;
 
 let db: DatabaseInstance | null = null;
 

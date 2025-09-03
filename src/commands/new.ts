@@ -17,6 +17,7 @@ export async function newCommand(): Promise<void> {
       console.error(
         'Failed to pull changes. Please resolve conflicts manually.'
       );
+      closeDatabase();
       process.exit(1);
     }
   }
