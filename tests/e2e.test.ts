@@ -20,9 +20,9 @@ describe('E2E Tests', () => {
   beforeEach(() => {
     fs.mkdirSync(TEST_CARDS_DIR, { recursive: true });
     // Initialize a git repo in the test directory
-    spawnSync(['git', 'init'], { cwd: TEST_CLINKY_HOME });
-    spawnSync(['git', 'config', 'user.email', 'test@example.com'], { cwd: TEST_CLINKY_HOME });
-    spawnSync(['git', 'config', 'user.name', 'Test User'], { cwd: TEST_CLINKY_HOME });
+    spawnSync({ cmd: ['git', 'init'], cwd: TEST_CLINKY_HOME });
+    spawnSync({ cmd: ['git', 'config', 'user.email', 'test@example.com'], cwd: TEST_CLINKY_HOME });
+    spawnSync({ cmd: ['git', 'config', 'user.name', 'Test User'], cwd: TEST_CLINKY_HOME });
   });
 
   afterEach(() => {

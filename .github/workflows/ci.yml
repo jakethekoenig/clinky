@@ -22,4 +22,4 @@ jobs:
         run: bun install
 
       - name: Run tests and check coverage
-        run: bun test --coverage && bun run scripts/check-coverage.js
+        run: bun test --coverage --coverage-reporter=lcov && bun run scripts/check-coverage.js
