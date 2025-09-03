@@ -5,8 +5,9 @@ import type { ClinkyPaths, Config } from "./util";
 import { nowUnix } from "./util";
 import { ReviewDB } from "./db";
 import { readCard, cardNameFromPath } from "./cards";
-import { updateSchedule, type Rating } from "./scheduling";
+import { updateSchedule, type Rating, ratingToScore } from "./scheduling";
 import { autoPull, autoPush } from "./git";
+import { openEditor } from "./editor";
 
 export async function reviewCommand(paths: ClinkyPaths, config: Config, relativePath?: string) {
   // Auto pull
@@ -21,9 +22,8 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
   if (relativePath) {
     cardPaths = [resolve(paths.home, relativePath)];
   } else {
-    // Build list of due cards by comparing card_state to files on disk
-    const dueNames = new Set(db.dueCards(nowUnix()));
-    // Scan cards dir
+    // Scan filesystem and decide due per file (missing state => due)
+    const now = nowUnix();
     const stack = [paths.cardsDir];
     while (stack.length) {
       const dir = stack.pop()!;
@@ -34,9 +34,9 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
           stack.push(full);
         } else if (st.isFile()) {
           const name = cardNameFromPath(paths, full);
-          if (dueNames.has(name) || dueNames.size === 0) {
-            cardPaths.push(full);
-          }
+          const state = db.getState(name);
+          const due = state.last_reviewed == null || state.next_due <= now;
+          if (due) cardPaths.push(full);
         }
       }
     }
@@ -59,12 +59,23 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
     // Show front
     console.log("-----");
     console.log(card.front || "(empty front)");
-    await ask("\nPress Enter to show the back...");
-    console.log("\n" + (card.back || "(empty back)"));
+    const before = await ask("\nPress Enter to show the back (q=quit, e=edit)... ");
+    if (before.trim().toLowerCase() === "q") {
+      break;
+    }
+    if (before.trim().toLowerCase() === "e") {
+      const editRes = openEditor(filePath);
+      if (!editRes.ok) {
+        console.error(editRes.message || "Failed to open editor");
+        break;
+      }
+      // re-read updated card front before showing back
+    }
+    console.log("\n" + (readCard(filePath).back || "(empty back)"));
 
-    // Ask for rating
+    // Ask for rating (1 easiest .. 4 hardest/again). Allow edit/quit here too.
     let ratingInput = await ask(
-      "\nRate your recall: (e)asy, (m)edium, (h)ard, (a)gain, (e to edit card, q to quit) > ",
+      "\nRate your recall: 1=easy, 2=medium, 3=hard, 4=again (e=edit, q=quit) > ",
     );
     ratingInput = ratingInput.trim().toLowerCase();
 
@@ -72,26 +83,24 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
       break;
     }
     if (ratingInput === "e") {
-      // Signal to caller to handle edit by exiting with code
-      rl.close();
-      // Use cli main to handle 'e' flag; for now, tell user to rerun with 'clinky new' and open file manually
-      console.log(
-        "Edit within your editor using 'clinky new' to create or edit the file directly.",
-      );
-      return;
+      const editRes = openEditor(filePath);
+      if (!editRes.ok) {
+        console.error(editRes.message || "Failed to open editor");
+        break;
+      }
+      // after edit, fall through to ask rating again
+      ratingInput = await ask("\nRate your recall: 1=easy, 2=medium, 3=hard, 4=again (q=quit) > ");
+      ratingInput = ratingInput.trim().toLowerCase();
+      if (ratingInput === "q") break;
     }
 
-    const map: Record<string, Rating> = {
-      e: "easy",
-      m: "medium",
-      h: "hard",
-      a: "again",
-      easy: "easy",
-      medium: "medium",
-      hard: "hard",
-      again: "again",
+    const mapNum: Record<string, Rating> = {
+      "1": "easy",
+      "2": "medium",
+      "3": "hard",
+      "4": "again",
     };
-    const rating = map[ratingInput];
+    const rating = mapNum[ratingInput];
     if (!rating) {
       console.log("Invalid input, skipping card.");
       continue;
@@ -99,12 +108,7 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
 
     const state = db.getState(name);
     const next = updateSchedule(state, rating);
-    db.recordReview(
-      name,
-      rating === "again" ? 0 : rating === "hard" ? 2 : rating === "medium" ? 3 : 5,
-      next.last_reviewed!,
-      next,
-    );
+    db.recordReview(name, ratingToScore(rating), next.last_reviewed!, next);
     reviewedCount += 1;
   }
 

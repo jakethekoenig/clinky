@@ -51,7 +51,7 @@ test("review a single card end-to-end", () => {
   const child = spawnSync("bun", ["run", "src/cli.ts", "review", relPath], {
     encoding: "utf8",
     env: { ...process.env, CLINKY_HOME: home },
-    input: "\n" + "e\n",
+    input: "\n" + "2\n",
   });
   expect(child.status).toBe(0);
   expect(child.stdout).toContain("Front");

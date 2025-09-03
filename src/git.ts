@@ -11,6 +11,15 @@ function inGitRepo(paths: ClinkyPaths): boolean {
 export function autoPull(paths: ClinkyPaths, config: Config): { ok: boolean; message?: string } {
   if (!config.auto_pull) return { ok: true };
   if (!inGitRepo(paths)) return { ok: true };
+  // If there is no upstream configured, skip pulling
+  const upstream = spawnSync(
+    "git",
+    ["-C", paths.home, "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+    { encoding: "utf8" },
+  );
+  if (upstream.status !== 0) {
+    return { ok: true };
+  }
   const res = spawnSync("git", ["-C", paths.home, "pull"], { encoding: "utf8" });
   if (res.status !== 0) {
     const msg = (res.stderr || res.stdout || "").toString();
