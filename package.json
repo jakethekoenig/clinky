@@ -1,0 +1,42 @@
+{
+  "name": "clinky",
+  "version": "1.0.0",
+  "description": "A CLI spaced repetition program",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20.0.0 <23.0.0"
+  },
+  "bin": {
+    "clinky": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "bun run --watch src/index.ts",
+    "test": "bun test",
+    "test:e2e": "bun test --test-name-pattern='e2e'",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write src/**/*.ts",
+    "format:check": "prettier --check src/**/*.ts",
+    "preinstall": "node -e \"const v=process.versions.node.split('.').map(Number); if(v[0]>=23) { console.error('\\n❌ Node.js v23+ is not yet supported due to better-sqlite3 compatibility.\\n\\n📋 Please use Node.js v20 or v22 LTS:\\n   nvm install 22\\n   nvm use 22\\n\\nThen try installing again.\\n'); process.exit(1); }\""
+  },
+  "keywords": ["cli", "spaced-repetition", "flashcards"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.0.0",
+    "commander": "^11.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
