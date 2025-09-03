@@ -1,5 +1,6 @@
 import { expect, test, describe, mock, beforeEach, spyOn } from 'bun:test';
 import fs from 'fs';
+import path from 'path';
 import * as srs from '../src/srs';
 import { getDueCards } from '../src/commands/review';
 import * as config from '../src/config';
@@ -22,7 +23,7 @@ describe('getDueCards', () => {
     ] as any);
     
     const getSrsDataMock = spyOn(srs, 'getSrsData').mockImplementation((cardPath) => {
-      const baseName = cardPath.split('/').pop();
+      const baseName = path.basename(cardPath);
       if (baseName === 'new.txt') {
         return { due_date: now } as srs.SrsData;
       }

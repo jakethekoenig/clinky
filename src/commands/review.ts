@@ -67,7 +67,23 @@ export const review = async (cardPath: string | undefined) => {
       console.log('Front:\n');
       console.log(card.front);
 
-      await prompt('\nPress Enter to see the back...');
+      const preRevealAction = await prompt('\nPress Enter to see the back (or [ed]it, [q]uit) > ');
+
+      if (preRevealAction === 'q') {
+        console.log('Quitting review session.');
+        quitSession = true;
+        break;
+      }
+
+      if (preRevealAction === 'ed') {
+        const editor = process.env.EDITOR || 'vim';
+        spawnSync({
+          cmd: ['sh', '-c', `${editor} "${cardToReviewPath}"`],
+          stdio: ['inherit', 'inherit', 'inherit'],
+        });
+        // After editing, we'll just continue to the next card in the loop
+        continue;
+      }
 
       console.log('\nBack:\n');
       console.log(card.back);

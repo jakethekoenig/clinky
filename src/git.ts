@@ -4,7 +4,8 @@ import { spawnSync } from 'bun';
 import { CLINKY_HOME } from './config';
 
 export const isGitRepo = (): boolean => {
-  return fs.existsSync(path.join(CLINKY_HOME, '.git'));
+  const proc = gitCommand(['rev-parse', '--is-inside-work-tree']);
+  return proc.exitCode === 0 && proc.stdout.toString().trim() === 'true';
 };
 
 const gitCommand = (args: string[]) => {
