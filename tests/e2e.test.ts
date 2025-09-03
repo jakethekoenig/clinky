@@ -4,6 +4,7 @@ import path from 'path';
 import { spawnSync } from 'bun';
 
 const TEST_CLINKY_HOME = './test_clinky_home';
+process.env.CLINKY_HOME = TEST_CLINKY_HOME;
 const TEST_CARDS_DIR = path.join(TEST_CLINKY_HOME, 'cards');
 
 const runClinky = (args: string[], options: { env?: NodeJS.ProcessEnv; input?: string } = {}) => {
@@ -49,13 +50,9 @@ describe('E2E Tests', () => {
   test('clinky review - should start a session with due cards', () => {
     // Create a card that is due
     fs.writeFileSync(path.join(TEST_CARDS_DIR, 'due_card.txt'), 'Front<!---split--->Back');
-    
-    console.log('Files in test cards dir:', fs.readdirSync(TEST_CARDS_DIR));
 
     const proc = runClinky(['review', '--non-interactive']);
     const output = proc.stdout.toString();
-    console.log('STDOUT:', output);
-    console.log('STDERR:', proc.stderr.toString());
     expect(output).toContain('Starting review session for 1 card(s)');
     expect(output).toContain('Quitting review session.');
   });
