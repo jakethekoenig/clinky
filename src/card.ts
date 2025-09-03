@@ -27,12 +27,15 @@ export function parseCard(content: string): { front: string; back: string } {
 }
 
 export function loadCard(path: string): Card {
-  const fullPath = join(getClinkyHome(), 'cards', path);
+  // Handle paths relative to CLINKY_HOME
+  // If path doesn't start with 'cards/', add it
+  const normalizedPath = path.startsWith('cards/') ? path : join('cards', path);
+  const fullPath = join(getClinkyHome(), normalizedPath);
   const content = readFileSync(fullPath, 'utf-8');
   const { front, back } = parseCard(content);
 
   return {
-    path,
+    path: normalizedPath.replace(/^cards\//, ''), // Store without 'cards/' prefix
     name: basename(path, '.txt'),
     front,
     back,
