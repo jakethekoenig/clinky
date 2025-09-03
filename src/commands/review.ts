@@ -108,58 +108,14 @@ export const review = async (cardPath: string | undefined, options: { nonInterac
         } else if (action === 'q') {
           console.log('Quitting review session.');
           quitSession = true;
-          break; // Exit the while loop
+          break;
         } else {
           console.log('Invalid input. Please try again.');
         }
       }
+
       if (quitSession) {
-        break; // Exit the for...of loop
-      }
-    }
-        quitSession = true;
         break;
-      }
-
-      if (preRevealAction === 'ed') {
-        const editor = process.env.EDITOR || 'vim';
-        spawnSync({
-          cmd: ['sh', '-c', `${editor} "${cardToReviewPath}"`],
-          stdio: ['inherit', 'inherit', 'inherit'],
-        });
-        // After editing, we'll just continue to the next card in the loop
-        continue;
-      }
-
-      console.log('\nBack:\n');
-      console.log(card.back);
-
-      let validAction = false;
-      while (!validAction) {
-        const action = await prompt('\nRate your recall: [e]asy, [m]edium, [h]ard, [a]gain, [ed]it, [q]uit > ');
-        const scoreMap: { [key: string]: number } = { e: 3, m: 2, h: 1, a: 0 };
-
-        if (action in scoreMap) {
-          updateSrsData(cardToReviewPath, scoreMap[action]);
-          reviewedCards.push(cardToReviewPath);
-          console.log('Card updated.');
-          validAction = true;
-        } else if (action === 'ed') {
-          const editor = process.env.EDITOR || 'vim';
-          spawnSync({
-            cmd: ['sh', '-c', `${editor} "${cardToReviewPath}"`],
-            stdio: ['inherit', 'inherit', 'inherit'],
-          });
-        } else if (action === 'q') {
-          console.log('Quitting review session.');
-          quitSession = true;
-          break; // Exit the while loop
-        } else {
-          console.log('Invalid input. Please try again.');
-        }
-      }
-      if (quitSession) {
-        break; // Exit the for...of loop
       }
     }
 
