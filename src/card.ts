@@ -13,7 +13,7 @@ export interface Card {
 export function parseCard(content: string): { front: string; back: string } {
   const parts = content.split('<!---split--->');
   if (parts.length !== 2) {
-    throw new Error('Invalid card format: missing <!---split--> separator');
+    throw new Error('Invalid card format: missing <!---split---> separator');
   }
 
   const front = parts[0].trim();

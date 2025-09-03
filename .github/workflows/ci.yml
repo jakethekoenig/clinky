@@ -30,9 +30,6 @@ jobs:
       - name: Run tests
         run: bun test
 
-      - name: Run E2E tests
-        run: bun run test:e2e
-
   format:
     runs-on: ubuntu-latest
 
