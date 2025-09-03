@@ -23,8 +23,9 @@ function computeState(historyScores: number[], historyDates: Date[]): SM2State {
     const q = historyScores[i]; // 0..5
     lastReview = historyDates[i];
     if (q < 3) {
+      // If the recall failed ("again"), keep the card due immediately
       repetitions = 0;
-      interval = 1;
+      interval = 0;
     } else {
       if (repetitions === 0) interval = 1;
       else if (repetitions === 1) interval = 6;
