@@ -86,8 +86,6 @@ If your `CLINKY_HOME` directory is a Git repository, `clinky` can automatically 
 -   `auto_pull`: If `true`, `clinky` will pull changes from your remote repository before creating a card or starting a review session.
 -   `auto_push`: If `true`, `clinky` will commit and push changes after you create a card or complete a review session.
 
-Opens an editor to create a new card. Uses the EDITOR environment variable to determine which editor to use falls back to `vim`. The path for the card is CLINKY_HOME/cards/TIMESTAMP.txt where TIMESTAMP is the current unix timestamp.
-
 ### clinky review
 
 Starts a review session for due cards. Prints the front of the card to the cli and prompts the user to press enter to see the back of the card. After showing the back of the card, prompts the user to rate their recall, easy, medium, hard, again. Updates the card's review schedule based on the user's rating. Can also enter e to edit the card and q to quit (before or after seeing the back).
