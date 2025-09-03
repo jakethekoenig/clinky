@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { spawnSync } from 'bun';
 
-const TEST_CLINKY_HOME = './test_clinky_home';
+const TEST_CLINKY_HOME = '../test_clinky_home';
 const TEST_CARDS_DIR = path.join(TEST_CLINKY_HOME, 'cards');
 
 const runClinky = (args: string[]) => {
