@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Neovim
+        run: sudo apt-get update && sudo apt-get install -y neovim
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests and check coverage
+        run: bun test --coverage --coverage-reporter=lcov && bun run scripts/check-coverage.js
