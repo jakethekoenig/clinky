@@ -1,0 +1,17 @@
+{
+  "name": "clinky",
+  "version": "0.1.0",
+  "description": "A CLI spaced repetition program with plain-text cards, git sync, and sqlite review data",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Bun runs TypeScript directly. No build needed.'",
+    "format": "prettier --write .",
+    "lint": "prettier --check .",
+    "test": "bun test",
+    "clinky": "bun src/index.ts"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}
