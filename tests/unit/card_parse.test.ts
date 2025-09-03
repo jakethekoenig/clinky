@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { writeFileSync, mkdtempSync } from "fs";
+import { writeFileSync, mkdtempSync, mkdirSync } from "fs";
 import { join } from "path";
 
 import { readCard } from "../../src/cards";
@@ -10,7 +10,7 @@ describe("card parsing", () => {
     const tmp = mkdtempSync("/tmp/clinky-test-");
     process.env.CLINKY_HOME = tmp;
     const path = join(tmp, "cards", "test.txt");
-    Bun.mkdirSync(join(tmp, "cards"), { recursive: true });
+    mkdirSync(join(tmp, "cards"), { recursive: true });
     const content = `Front line 1
 %comment
 Front line 2

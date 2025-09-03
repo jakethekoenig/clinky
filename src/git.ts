@@ -20,9 +20,25 @@ export function isGitRepo(): boolean {
   return res.ok && res.stdout.trim() === "true";
 }
 
+function hasAnyRemote(): boolean {
+  const rem = runGit(["remote"]);
+  return rem.ok && rem.stdout.trim().length > 0;
+}
+
+function hasUpstream(): boolean {
+  const res = runGit([
+    "rev-parse",
+    "--abbrev-ref",
+    "--symbolic-full-name",
+    "@{u}",
+  ]);
+  return res.ok;
+}
+
 export function autoPullIfEnabled(enabled: boolean): void {
   if (!enabled) return;
   if (!isGitRepo()) return;
+  if (!hasAnyRemote() || !hasUpstream()) return;
   // fetch + pull --rebase
   runGit(["fetch", "--all", "--prune"]);
   const pull = runGit(["pull", "--rebase"]);
