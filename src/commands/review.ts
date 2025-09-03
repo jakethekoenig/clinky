@@ -76,9 +76,13 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
     output: process.stdout,
   });
 
+  // Create a map of cards to avoid repeated filesystem scans
+  const allCards = getAllCards();
+  const cardMap = new Map(allCards.map((card) => [card.name, card]));
+
   try {
     for (const cardName of cardsToReview) {
-      const card = getCard(cardName);
+      const card = cardMap.get(cardName);
       if (!card) {
         console.warn(`Card not found: ${cardName}`);
         continue;

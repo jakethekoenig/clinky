@@ -100,7 +100,7 @@ export function getDueCards(): string[] {
   const stmt = db.prepare(`
     SELECT card_name
     FROM card_schedules
-    WHERE next_review <= datetime('now')
+    WHERE datetime(next_review) <= datetime('now')
     ORDER BY next_review ASC
   `);
 
