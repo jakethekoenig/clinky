@@ -1,0 +1,20 @@
+# Node/Bun
+node_modules/
+dist/
+*.log
+.DS_Store
+
+# Test artifacts
+tmp/
+coverage/
+.coverage/
+coverage-final.json
+lcov.info
+
+# Clinky data (users should not commit their personal data by default)
+config/
+cards/
+reviews.db
+
+# Environment
+.env
