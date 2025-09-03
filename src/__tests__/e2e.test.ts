@@ -34,7 +34,7 @@ describe('e2e tests', () => {
         env: testEnv,
         stdio: 'pipe',
       });
-    } catch (error) {
+    } catch {
       // Expected to fail since no cards exist, but directory should be created
     }
 
@@ -51,7 +51,7 @@ describe('e2e tests', () => {
         env: testEnv,
         stdio: 'pipe',
       });
-    } catch (error) {
+    } catch {
       // Expected to fail, but config should be created
     }
 

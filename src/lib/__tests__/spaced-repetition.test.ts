@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'bun:test';
-import { calculateNextReview, parseReviewScore } from '../spaced-repetition.js';
-import { ReviewScore, type CardSchedule } from '../../types.js';
+import { calculateNextReview, parseReviewScore } from '../spaced-repetition';
+import { ReviewScore, type CardSchedule } from '../../types';
 
 describe('spaced-repetition', () => {
   describe('parseReviewScore', () => {
