@@ -26,6 +26,9 @@ jobs:
     - name: Install dependencies
       run: bun install
     
+    - name: Verify better-sqlite3 installation
+      run: node -e "require('better-sqlite3'); console.log('✅ better-sqlite3 loaded successfully')"
+    
     - name: Check formatting
       run: bun run format:check
     

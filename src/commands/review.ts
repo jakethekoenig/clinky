@@ -32,6 +32,7 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
   }
 
   let cardsToReview: string[];
+  let allCards: ReturnType<typeof getAllCards>;
 
   if (cardPath) {
     // Review specific card
@@ -41,12 +42,14 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
       process.exit(1);
     }
     cardsToReview = [name];
+    // Still need to load all cards for the card map
+    allCards = getAllCards();
   } else {
     // Get all due cards
     const dueCards = getDueCards();
 
     // Also include cards that have never been reviewed
-    const allCards = getAllCards();
+    allCards = getAllCards();
     const allCardNames = allCards.map((c) => c.name);
     const neverReviewed = allCardNames.filter(
       (name) => !dueCards.includes(name)
@@ -77,7 +80,6 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
   });
 
   // Create a map of cards to avoid repeated filesystem scans
-  const allCards = getAllCards();
   const cardMap = new Map(allCards.map((card) => [card.name, card]));
 
   try {
