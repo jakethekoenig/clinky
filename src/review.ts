@@ -105,7 +105,7 @@ export async function startReview(optionalRelPath?: string): Promise<void> {
     while (true) {
       const ans = (
         await prompt(
-          "\nRate recall [a]gain [h]ard [m]edium [e]asy, or 'e' edit, 'q' quit: ",
+          "\nRate recall [1] again [2] hard [3] medium [4] easy, or 'e' edit, 'q' quit: ",
         )
       )
         .trim()
@@ -116,10 +116,10 @@ export async function startReview(optionalRelPath?: string): Promise<void> {
         continue;
       }
       const map: Record<string, ReviewScore | undefined> = {
-        a: "again",
-        h: "hard",
-        m: "medium",
-        e: "easy",
+        "1": "again",
+        "2": "hard",
+        "3": "medium",
+        "4": "easy",
       };
       const score = map[ans];
       if (!score) {

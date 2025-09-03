@@ -37,7 +37,10 @@ export function readCard(path: string): Card {
 
 export function openEditor(filePath: string): void {
   const editor = process.env.EDITOR?.trim() || "vim";
-  const res = spawnSync(editor, [filePath], { stdio: "ignore" });
+  const useTty = process.stdin.isTTY && process.stdout.isTTY;
+  const res = spawnSync(editor, [filePath], {
+    stdio: useTty ? "inherit" : "ignore",
+  });
   if (res.status !== 0) {
     throw new Error(`Editor exited with status ${res.status}`);
   }
