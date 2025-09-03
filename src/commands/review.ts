@@ -35,15 +35,15 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
   let allCards: ReturnType<typeof getAllCards>;
 
   if (cardPath) {
-    // Review specific card
+    // Review specific card - optimize by not scanning all cards
     const { name, card } = resolveCardArgument(cardPath);
     if (!card) {
       console.error(`Card not found: ${cardPath}`);
       process.exit(1);
     }
     cardsToReview = [name];
-    // Still need to load all cards for the card map
-    allCards = getAllCards();
+    // Create minimal allCards array with just this card
+    allCards = [card];
   } else {
     // Get all due cards
     const dueCards = getDueCards();
@@ -90,7 +90,7 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
         continue;
       }
 
-      const result = await reviewCard(card.name, rl);
+      const result = await reviewCard(card, rl);
       if (!result.continue) {
         break;
       }
@@ -117,13 +117,12 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
 }
 
 async function reviewCard(
-  cardName: string,
+  card: ReturnType<typeof getCard>,
   rl: Interface
 ): Promise<{ continue: boolean; reviewed: boolean }> {
-  const card = getCard(cardName);
   if (!card) return { continue: true, reviewed: false };
 
-  console.log(`\n--- Card: ${cardName} ---`);
+  console.log(`\n--- Card: ${card.name} ---`);
   console.log(card.front);
   console.log('\nPress Enter to see the back, or:');
   console.log('  edit - edit card');
