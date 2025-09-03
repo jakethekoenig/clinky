@@ -1,32 +1,44 @@
 # Clinky
 
-Vision: a cli spaced repetition program
-Minimal features e.g. it will be byo editor and search tool. Cards will be plain text. Users can use git for history and sync.
+A CLI spaced repetition program for flashcard-based learning. Clinky uses plain text files for cards and implements the SM-2 spaced repetition algorithm to optimize your learning schedule.
 
-# Full Spec
+## Features
 
-## Commands
+- **Plain text cards**: Cards are stored as simple text files that you can edit with any editor
+- **Spaced repetition**: Uses the SM-2 algorithm to schedule reviews based on your performance
+- **Git integration**: Automatically sync your cards and progress using git
+- **Flexible organization**: Organize cards into directories/decks as you prefer
+- **Cross-platform**: Works on Linux, macOS, and Windows
 
-### clinky new
+## Installation
 
-Opens an editor to create a new card. Uses the EDITOR environment variable to determine which editor to use falls back to `vim`. The path for the card is CLINKY_HOME/cards/TIMESTAMP.txt where TIMESTAMP is the current unix timestamp.
+### Prerequisites
 
-### clinky review
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Bun](https://bun.sh/) (for development)
 
-Starts a review session for due cards. Prints the front of the card to the cli and prompts the user to press enter to see the back of the card. After showing the back of the card, prompts the user to rate their recall, easy, medium, hard, again. Updates the card's review schedule based on the user's rating. Can also enter e to edit the card and q to quit (before or after seeing the back).
+### Install from source
 
-Arguments:
-* path: Optional path to a specific card to review relative to CLINKY_HOME. If not provided, reviews all due cards in CLINKY_HOME.
+```bash
+git clone <repository-url>
+cd clinky
+bun install
+bun run build
+npm link  # or add dist/index.js to your PATH
+```
 
-## Storage & Format
+## Usage
 
-Clinky data is stored under `~/.config/clinky/` by default, this can be overridden by setting the CLINKY_HOME environment variable. In the rest of this document we refer to this directory as `CLINKY_HOME`.
+### Creating Cards
 
-### Cards
+Create a new flashcard:
 
-Cards are stored under CLINKY_HOME/cards/. The user can use directories to organize them into decks if desired.
+```bash
+clinky new
+```
 
-Each card is a plain text file with the following format:
+This opens your default editor (set via `EDITOR` environment variable, defaults to `vim`) with a template:
+
 ```
 Front of the card
 Can be multiple lines
@@ -35,56 +47,165 @@ Back of the card
 % Lines starting with % are comments and ignored by clinky when printing for review.
 ```
 
-Note: when you run `clinky new`, the editor will open with a template that already has the split line and comment line. The user can edit the front and back of the card as needed.
+Edit the front and back of the card, save, and exit the editor.
 
-### Review Data
+### Reviewing Cards
 
-Review data is stored in an sqlite database at CLINKY_HOME/reviews.db.
+Start a review session with all due cards:
 
-Possible schema for the reviews table:
-
-```sql
-CREATE TABLE reviews (
-    card_name TEXT NOT NULL, -- name of the card file. Note it's not the path. Cards must have unique names and moving them doesn't affect the review data.
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- when the card was reviewed
-    score INTEGER NOT NULL,
-);
+```bash
+clinky review
 ```
 
-This is sufficient to implement a basic spaced repetition algorithm like SM-2.
+Review a specific card:
+
+```bash
+clinky review path/to/card.txt
+```
+
+During review:
+- Press **Enter** to reveal the back of the card
+- Rate your recall:
+  - `1` or `again` - Didn't remember at all
+  - `2` or `hard` - Remembered with difficulty  
+  - `3` or `medium` - Remembered with some effort
+  - `4` or `easy` - Remembered easily
+- Press `e` to edit the current card
+- Press `q` to quit the review session
 
 ### Configuration
 
-Clinky can be configured via a config file at CLINKY_HOME/config.json. Starting configuration options:
+Clinky stores data in `~/.config/clinky/` by default. Override this with the `CLINKY_HOME` environment variable.
+
+Configuration file (`CLINKY_HOME/config.json`):
+
 ```json
 {
-    "auto_pull": true // whether to automatically pull from git before starting a review session
-    "auto_push": true // whether to automatically push to git after finishing a review session or creating a card
+  "autoPull": true,  // Pull git changes before review/create
+  "autoPush": true   // Push git changes after review/create
 }
 ```
 
-## Sync
+## File Structure
 
-The preferred way to synchronize clinky data is via git. If CLINKY_HOME is in a git repository then:
+```
+~/.config/clinky/           # Default CLINKY_HOME
+├── cards/                  # Your flashcards
+│   ├── 1693747200.txt     # Card files (timestamp.txt)
+│   ├── math/              # Optional: organize into folders
+│   │   └── algebra.txt
+│   └── languages/
+│       └── spanish.txt
+├── config.json            # Configuration
+└── reviews.db             # SQLite database with review history
+```
 
-### auto_push
+## Card Format
 
-Automatically commits and pushes changes to the remote repository after creating a new card or finishing a review session. The commits message should be "Created card CARD_PATH" or "Reviewed N cards" respectively.
+Cards are plain text files with this format:
 
-### auto_pull
+```
+Front content
+Multiple lines supported
+<!---split--->
+Back content
+Also multiple lines
+% Comments start with % and are ignored during review
+% Use comments for hints, sources, etc.
+```
 
-Automatically pulls changes from the remote repository before starting a review session. And before creating a card. If there are merge conflicts, clinky should abort the operation and inform the user to resolve the conflicts manually.
+## Git Integration
 
+Initialize a git repository in your `CLINKY_HOME` to sync across devices:
 
-## Tech decisions
+```bash
+cd ~/.config/clinky
+git init
+git remote add origin <your-repo-url>
+```
 
-Lets:
-* Use typescript/bun
-    * You can decide which libraries to use.
-* Use sqlite for review data
-* Setup github actions which check formatting/lint
-* Write comprehensive tests
-* Some of those tests should be e2e tests which run the cli commands and check the output
-    * They should even be some tests that use git and sqlite
-* Be sure to make a gitignore for artifacts that shouldn't end up in git
-* After implementing all this update the README with instructions on how to use the program
+With `autoPull` and `autoPush` enabled, Clinky will automatically:
+- Pull changes before creating cards or starting reviews
+- Commit and push changes after creating cards or finishing reviews
+
+## Development
+
+### Setup
+
+```bash
+git clone <repository-url>
+cd clinky
+bun install
+```
+
+### Available Scripts
+
+```bash
+bun run build      # Compile TypeScript
+bun run dev        # Run in development mode
+bun test           # Run all tests
+bun run test:e2e   # Run end-to-end tests
+bun run lint       # Lint code
+bun run format     # Format code
+```
+
+### Project Structure
+
+```
+src/
+├── commands/           # CLI command implementations
+│   ├── new.ts         # Create new cards
+│   └── review.ts      # Review session logic
+├── lib/               # Core library functions
+│   ├── cards.ts       # Card parsing and management
+│   ├── config.ts      # Configuration handling
+│   ├── database.ts    # SQLite database operations
+│   ├── git.ts         # Git integration
+│   └── spaced-repetition.ts  # SM-2 algorithm
+├── __tests__/         # End-to-end tests
+└── index.ts           # CLI entry point
+```
+
+### Testing
+
+The project includes comprehensive tests:
+
+- **Unit tests**: Test individual functions and modules
+- **Integration tests**: Test component interactions
+- **End-to-end tests**: Test the full CLI workflow
+
+Run tests with:
+
+```bash
+bun test                    # All tests
+bun test src/lib/__tests__/ # Unit tests only
+bun run test:e2e           # E2E tests only
+```
+
+## Spaced Repetition Algorithm
+
+Clinky implements a simplified version of the SM-2 algorithm:
+
+1. **New cards**: Start with 1-day interval
+2. **Successful reviews**: Increase interval based on ease factor
+3. **Failed reviews**: Reset to short intervals
+4. **Ease factor**: Adjusts based on performance (1.3 minimum)
+
+Review ratings affect scheduling:
+- **Again**: Reset progress, review tomorrow
+- **Hard**: Reduce interval, lower ease factor
+- **Medium**: Standard progression
+- **Easy**: Increase interval more, higher ease factor
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.

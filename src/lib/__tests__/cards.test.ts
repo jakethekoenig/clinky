@@ -1,0 +1,78 @@
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
+import { mkdirSync, rmSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import { parseCard, getAllCards, createCardTemplate } from '../cards.js';
+
+const testDir = join(process.cwd(), 'test-cards');
+
+describe('cards', () => {
+  beforeEach(() => {
+    // Create test directory
+    mkdirSync(testDir, { recursive: true });
+  });
+  
+  afterEach(() => {
+    // Clean up test directory
+    rmSync(testDir, { recursive: true, force: true });
+  });
+  
+  describe('parseCard', () => {
+    it('should parse a valid card', () => {
+      const cardContent = `Front of the card
+Multiple lines front
+<!---split--->
+Back of the card
+% This is a comment
+Multiple lines back`;
+      
+      const cardPath = join(testDir, 'test.txt');
+      writeFileSync(cardPath, cardContent);
+      
+      const card = parseCard(cardPath);
+      
+      expect(card).not.toBe(null);
+      expect(card!.name).toBe('test');
+      expect(card!.front).toBe('Front of the card\nMultiple lines front');
+      expect(card!.back).toBe('Back of the card\nMultiple lines back');
+      expect(card!.filePath).toBe(cardPath);
+    });
+    
+    it('should filter out comment lines', () => {
+      const cardContent = `Front
+<!---split--->
+Back line 1
+% This is a comment
+Back line 2
+% Another comment`;
+      
+      const cardPath = join(testDir, 'test.txt');
+      writeFileSync(cardPath, cardContent);
+      
+      const card = parseCard(cardPath);
+      
+      expect(card!.back).toBe('Back line 1\nBack line 2');
+    });
+    
+    it('should return null for invalid card format', () => {
+      const cardContent = 'No split marker here';
+      
+      const cardPath = join(testDir, 'invalid.txt');
+      writeFileSync(cardPath, cardContent);
+      
+      const card = parseCard(cardPath);
+      
+      expect(card).toBe(null);
+    });
+  });
+  
+  describe('createCardTemplate', () => {
+    it('should create a valid template', () => {
+      const template = createCardTemplate();
+      
+      expect(template).toContain('<!---split--->');
+      expect(template).toContain('Front of the card');
+      expect(template).toContain('Back of the card');
+      expect(template).toContain('% Lines starting with %');
+    });
+  });
+});
