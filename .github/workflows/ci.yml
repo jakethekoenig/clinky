@@ -19,5 +19,5 @@ jobs:
         run: bun run lint
       - name: Typecheck
         run: bun run typecheck
-      - name: Test
-        run: bun test --bail
+      - name: Test (with coverage)
+        run: bun run scripts/check-coverage.js
