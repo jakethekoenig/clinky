@@ -34,6 +34,16 @@ clinky new
 clinky review [path]
 ```
 
+Review controls:
+
+- Before showing the back: press Enter to continue, or `q` to quit, or `e` to edit the card in your `$EDITOR`
+- After showing the back: rate your recall using numbers
+  - `1 = easy`
+  - `2 = medium`
+  - `3 = hard`
+  - `4 = again`
+  - You can also press `e` to edit, or `q` to quit
+
 Examples:
 
 ```
@@ -57,7 +67,12 @@ Opens an editor to create a new card. Uses the EDITOR environment variable to de
 
 ### clinky review
 
-Starts a review session for due cards. Prints the front of the card to the cli and prompts the user to press enter to see the back of the card. After showing the back of the card, prompts the user to rate their recall, easy, medium, hard, again. Updates the card's review schedule based on the user's rating. Can also enter e to edit the card and q to quit (before or after seeing the back).
+Starts a review session for due cards. Prints the front of the card to the CLI and prompts the user to press Enter to see the back of the card.
+
+- Before showing the back: press Enter to continue, or `q` to quit, or `e` to edit the card in your `$EDITOR`
+- After showing the back: rate your recall with numbers — `1=easy`, `2=medium`, `3=hard`, `4=again`. You may also press `e` to edit or `q` to quit.
+
+Updates the card's review schedule (SM-2 style) based on your numeric rating.
 
 Arguments:
 
