@@ -50,8 +50,8 @@ describe('E2E Tests', () => {
     // Create a card that is due
     fs.writeFileSync(path.join(TEST_CARDS_DIR, 'due_card.txt'), 'Front<!---split--->Back');
 
-    // Provide 'q' to stdin to quit immediately after the first card
-    const proc = runClinky(['review'], { input: 'q\n' });
+    // Provide Enter then 'q' to stdin to reveal back then quit
+    const proc = runClinky(['review'], { input: '\nq\n' });
     const output = proc.stdout.toString();
     expect(output).toContain('Starting review session for 1 card(s)');
     expect(output).toContain('Quitting review session.');
