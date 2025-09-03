@@ -54,22 +54,24 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
 
   for (const filePath of cardPaths) {
     const name = cardNameFromPath(paths, filePath);
-    const card = readCard(filePath);
 
     // Show front
     console.log("-----");
+    let quit = false;
     while (true) {
       const current = readCard(filePath);
       console.log(current.front || "(empty front)");
       const before = await ask("\nPress Enter to show the back (q=quit, e=edit)... ");
       const cmd = before.trim().toLowerCase();
       if (cmd === "q") {
+        quit = true;
         break;
       }
       if (cmd === "e") {
         const editRes = openEditor(filePath);
         if (!editRes.ok) {
           console.error(editRes.message || "Failed to open editor");
+          quit = true;
           break;
         }
         // loop back to reprint updated front
@@ -79,8 +81,8 @@ export async function reviewCommand(paths: ClinkyPaths, config: Config, relative
       console.log("\n" + (readCard(filePath).back || "(empty back)"));
       break;
     }
-    if (false) {
-      /* placeholder to satisfy structure */
+    if (quit) {
+      break;
     }
 
     // Ask for rating (1 easiest .. 4 hardest/again). Allow multiple edits/quit here too.
