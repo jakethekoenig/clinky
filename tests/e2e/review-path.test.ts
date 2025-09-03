@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
-import { mkdtempSync, rmSync, mkdirSync, writeFileSync, existsSync } from 'fs';
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { loadCard } from '../../src/card';
