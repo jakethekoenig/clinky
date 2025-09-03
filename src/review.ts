@@ -2,7 +2,7 @@ import { readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import readline from "node:readline";
 import type { ClinkyPaths, Config } from "./util";
-import { getClinkyHome, loadConfig, nowUnix } from "./util";
+import { nowUnix } from "./util";
 import { ReviewDB } from "./db";
 import { readCard, cardNameFromPath } from "./cards";
 import { updateSchedule, type Rating } from "./scheduling";

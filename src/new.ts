@@ -1,4 +1,4 @@
-import { getClinkyHome, loadConfig, nowUnix, type ClinkyPaths, type Config } from "./util";
+import { nowUnix, type ClinkyPaths, type Config } from "./util";
 import { autoPull, autoPush } from "./git";
 import { cardPathForTimestamp, ensureNewCardTemplate } from "./cards";
 import { openEditor } from "./editor";
