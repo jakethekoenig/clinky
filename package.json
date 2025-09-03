@@ -1,0 +1,27 @@
+{
+  "name": "clinky",
+  "version": "0.1.0",
+  "description": "A CLI spaced repetition program",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "clinky": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "bun build --target=node --outdir dist src/cli.ts",
+    "dev": "bun run src/cli.ts",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@typescript-eslint/eslint-plugin": "^8.6.0",
+    "@typescript-eslint/parser": "^8.6.0",
+    "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2"
+  }
+}

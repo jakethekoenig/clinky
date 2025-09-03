@@ -3,7 +3,51 @@
 Vision: a cli spaced repetition program
 Minimal features e.g. it will be byo editor and search tool. Cards will be plain text. Users can use git for history and sync.
 
-# Full Spec
+## Getting Started
+
+### Prerequisites
+
+- Bun (https://bun.sh)
+- Git (optional but recommended for sync)
+
+### Install
+
+- Clone this repository
+- Install dependencies:
+  ```
+  bun install
+  ```
+- Build (optional; you can also run via `bun run src/cli.ts`):
+  ```
+  bun run build
+  ```
+
+### Usage
+
+- Default data directory: `~/.config/clinky` (override with `CLINKY_HOME`)
+- Editor for `clinky new`: `$EDITOR` (falls back to `vim`)
+
+Commands:
+
+```
+clinky new
+clinky review [path]
+```
+
+Examples:
+
+```
+# Create a new card (opens $EDITOR)
+CLINKY_HOME=~/.config/clinky EDITOR=nano clinky new
+
+# Review due cards
+clinky review
+
+# Review a specific card by relative path from CLINKY_HOME
+clinky review cards/1725350000.txt
+```
+
+## Full Spec
 
 ## Commands
 
@@ -16,7 +60,8 @@ Opens an editor to create a new card. Uses the EDITOR environment variable to de
 Starts a review session for due cards. Prints the front of the card to the cli and prompts the user to press enter to see the back of the card. After showing the back of the card, prompts the user to rate their recall, easy, medium, hard, again. Updates the card's review schedule based on the user's rating. Can also enter e to edit the card and q to quit (before or after seeing the back).
 
 Arguments:
-* path: Optional path to a specific card to review relative to CLINKY_HOME. If not provided, reviews all due cards in CLINKY_HOME.
+
+- path: Optional path to a specific card to review relative to CLINKY_HOME. If not provided, reviews all due cards in CLINKY_HOME.
 
 ## Storage & Format
 
@@ -27,6 +72,7 @@ Clinky data is stored under `~/.config/clinky/` by default, this can be overridd
 Cards are stored under CLINKY_HOME/cards/. The user can use directories to organize them into decks if desired.
 
 Each card is a plain text file with the following format:
+
 ```
 Front of the card
 Can be multiple lines
@@ -56,6 +102,7 @@ This is sufficient to implement a basic spaced repetition algorithm like SM-2.
 ### Configuration
 
 Clinky can be configured via a config file at CLINKY_HOME/config.json. Starting configuration options:
+
 ```json
 {
     "auto_pull": true // whether to automatically pull from git before starting a review session
@@ -75,16 +122,16 @@ Automatically commits and pushes changes to the remote repository after creating
 
 Automatically pulls changes from the remote repository before starting a review session. And before creating a card. If there are merge conflicts, clinky should abort the operation and inform the user to resolve the conflicts manually.
 
-
 ## Tech decisions
 
 Lets:
-* Use typescript/bun
-    * You can decide which libraries to use.
-* Use sqlite for review data
-* Setup github actions which check formatting/lint
-* Write comprehensive tests
-* Some of those tests should be e2e tests which run the cli commands and check the output
-    * They should even be some tests that use git and sqlite
-* Be sure to make a gitignore for artifacts that shouldn't end up in git
-* After implementing all this update the README with instructions on how to use the program
+
+- Use typescript/bun
+  - You can decide which libraries to use.
+- Use sqlite for review data
+- Setup github actions which check formatting/lint
+- Write comprehensive tests
+- Some of those tests should be e2e tests which run the cli commands and check the output
+  - They should even be some tests that use git and sqlite
+- Be sure to make a gitignore for artifacts that shouldn't end up in git
+- After implementing all this update the README with instructions on how to use the program
