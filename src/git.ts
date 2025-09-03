@@ -16,7 +16,16 @@ const gitCommand = (args: string[]) => {
   });
 };
 
+const hasRemote = (): boolean => {
+  const proc = gitCommand(['remote']);
+  return proc.stdout.toString().trim().length > 0;
+};
+
 export const gitPull = (): boolean => {
+  if (!hasRemote()) {
+    console.log('No remote configured, skipping pull.');
+    return true;
+  }
   console.log('Pulling changes from remote...');
   const proc = gitCommand(['pull']);
   if (proc.exitCode !== 0) {
@@ -46,6 +55,10 @@ export const gitCommit = (message: string) => {
 };
 
 export const gitPush = () => {
+  if (!hasRemote()) {
+    console.log('No remote configured, skipping push.');
+    return true;
+  }
   console.log('Pushing changes to remote...');
   const proc = gitCommand(['push']);
   if (proc.exitCode !== 0) {
