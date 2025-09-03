@@ -10,7 +10,7 @@ const runClinky = (args: string[], options: { env?: NodeJS.ProcessEnv; input?: s
   return spawnSync({
     cmd: ['bun', 'run', 'src/index.ts', ...args],
     env: { ...process.env, CLINKY_HOME: TEST_CLINKY_HOME, ...options.env },
-    stdin: options.input,
+    stdio: [options.input || 'pipe', 'pipe', 'pipe'],
   });
 };
 
