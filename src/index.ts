@@ -3,7 +3,6 @@
 import { Command } from 'commander';
 import { newCommand } from './commands/new.js';
 import { reviewCommand } from './commands/review.js';
-import { closeDatabase } from './lib/database.js';
 
 const program = new Command();
 
@@ -40,13 +39,19 @@ program
 // Handle cleanup on exit
 process.on('SIGINT', () => {
   console.log('\nExiting...');
-  closeDatabase();
-  process.exit(0);
+  // Lazy import to avoid loading better-sqlite3 unless needed
+  import('./lib/database.js').then(({ closeDatabase }) => {
+    closeDatabase();
+    process.exit(0);
+  });
 });
 
 process.on('SIGTERM', () => {
-  closeDatabase();
-  process.exit(0);
+  // Lazy import to avoid loading better-sqlite3 unless needed
+  import('./lib/database.js').then(({ closeDatabase }) => {
+    closeDatabase();
+    process.exit(0);
+  });
 });
 
 // Parse command line arguments

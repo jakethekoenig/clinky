@@ -3,9 +3,11 @@ import { join } from 'path';
 import type { Review, CardSchedule } from '../types.js';
 import { getClinkyHome } from './config.js';
 
-let db: Database.Database | null = null;
+type DatabaseInstance = ReturnType<typeof Database>;
 
-export function getDatabase(): Database.Database {
+let db: DatabaseInstance | null = null;
+
+export function getDatabase(): DatabaseInstance {
   if (!db) {
     const dbPath = join(getClinkyHome(), 'reviews.db');
     db = new Database(dbPath);

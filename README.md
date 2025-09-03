@@ -14,8 +14,14 @@ A CLI spaced repetition program for flashcard-based learning. Clinky uses plain 
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) (v18 or higher)
+- [Node.js](https://nodejs.org/) v20 or v22 LTS (v23+ not yet supported due to native module compatibility)
 - [Bun](https://bun.sh/) (for development)
+
+**Note**: If you have Node.js v23+, please switch to v22 LTS:
+```bash
+nvm install 22
+nvm use 22
+```
 
 ### Install from source
 
