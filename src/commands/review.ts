@@ -58,6 +58,7 @@ export const review = async (cardPath: string | undefined) => {
 
     console.log(`Starting review session for ${cardsToReview.length} card(s)...`);
 
+    let quitSession = false;
     for (const cardToReviewPath of cardsToReview) {
       const card = parseCard(cardToReviewPath);
       if (!card) continue;
@@ -89,10 +90,14 @@ export const review = async (cardPath: string | undefined) => {
           });
         } else if (action === 'q') {
           console.log('Quitting review session.');
-          return;
+          quitSession = true;
+          break; // Exit the while loop
         } else {
           console.log('Invalid input. Please try again.');
         }
+      }
+      if (quitSession) {
+        break; // Exit the for...of loop
       }
     }
 

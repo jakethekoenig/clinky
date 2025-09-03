@@ -15,7 +15,11 @@ describe('getDueCards', () => {
     const future = new Date(now.getTime() + 1000);
 
     spyOn(fs, 'existsSync').mockReturnValue(true);
-    spyOn(fs, 'readdirSync').mockReturnValue(['new.txt', 'due.txt', 'not_due.txt'] as any);
+    spyOn(fs, 'readdirSync').mockReturnValue([
+      { name: 'new.txt', isDirectory: () => false },
+      { name: 'due.txt', isDirectory: () => false },
+      { name: 'not_due.txt', isDirectory: () => false },
+    ] as any);
     
     const getSrsDataMock = spyOn(srs, 'getSrsData').mockImplementation((cardPath) => {
       const baseName = cardPath.split('/').pop();
