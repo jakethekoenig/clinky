@@ -103,11 +103,12 @@ Test back
     };
     writeFileSync(join(testClinkyHome, 'config.json'), JSON.stringify(config));
 
-    // This should not crash
-    const output = execSync('node dist/index.js review', {
+    // Test that git operations work - just check it doesn't crash and starts properly
+    const output = execSync('echo "q" | node dist/index.js review', {
       env: testEnv,
       encoding: 'utf-8',
       stdio: 'pipe',
+      shell: true,
     });
 
     expect(output).toContain('Starting review session');

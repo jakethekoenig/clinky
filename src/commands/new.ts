@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { existsSync } from 'fs';
-import { basename } from 'path';
-import { ensureClinkyHome, getConfig } from '../lib/config.js';
+import { basename, relative } from 'path';
+import { ensureClinkyHome, getConfig, getClinkyHome } from '../lib/config.js';
 import { createCardTemplate, getCardPath, saveCard } from '../lib/cards.js';
 import { gitPull, gitCommitAndPush } from '../lib/git.js';
 
@@ -56,8 +56,9 @@ export async function newCommand(): Promise<void> {
       // Auto push if enabled
       if (config.autoPush) {
         console.log('Pushing changes...');
-        const cardName = basename(cardPath);
-        if (!gitCommitAndPush(`Created card ${cardName}`)) {
+        const clinkyHome = getClinkyHome();
+        const relativePath = relative(clinkyHome, cardPath);
+        if (!gitCommitAndPush(`Created card ${relativePath}`)) {
           console.warn('Failed to push changes to git');
         }
       }

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { mkdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { parseCard, getAllCards, createCardTemplate } from '../cards.js';
+import { parseCard, getAllCards, createCardTemplate, resolveCardArgument, getCardByPath } from '../cards.js';
 
 const testDir = join(process.cwd(), 'test-cards');
 
@@ -73,6 +73,49 @@ Back line 2
       expect(template).toContain('Front of the card');
       expect(template).toContain('Back of the card');
       expect(template).toContain('% Lines starting with %');
+    });
+  });
+  
+  describe('resolveCardArgument', () => {
+    it('should resolve card names', () => {
+      const cardContent = `Test front
+<!---split--->
+Test back`;
+      
+      // Create cards subdirectory
+      const cardsDir = join(testDir, 'cards');
+      mkdirSync(cardsDir, { recursive: true });
+      const cardPath = join(cardsDir, 'test.txt');
+      writeFileSync(cardPath, cardContent);
+      
+      // Mock getClinkyHome to return testDir
+      const originalEnv = process.env.CLINKY_HOME;
+      process.env.CLINKY_HOME = testDir;
+      
+      const result = resolveCardArgument('test');
+      expect(result.name).toBe('test');
+      expect(result.card).not.toBe(null);
+      
+      process.env.CLINKY_HOME = originalEnv;
+    });
+    
+    it('should resolve card paths', () => {
+      const cardContent = `Test front
+<!---split--->
+Test back`;
+      
+      const cardPath = join(testDir, 'test.txt');
+      writeFileSync(cardPath, cardContent);
+      
+      // Mock getClinkyHome to return testDir
+      const originalEnv = process.env.CLINKY_HOME;
+      process.env.CLINKY_HOME = testDir;
+      
+      const result = resolveCardArgument('test.txt');
+      expect(result.name).toBe('test');
+      expect(result.card).not.toBe(null);
+      
+      process.env.CLINKY_HOME = originalEnv;
     });
   });
 });

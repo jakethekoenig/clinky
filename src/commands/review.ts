@@ -2,7 +2,7 @@ import { createInterface, Interface } from 'readline';
 import { spawn } from 'child_process';
 import { basename } from 'path';
 import { ensureClinkyHome, getConfig } from '../lib/config.js';
-import { getAllCards, getCard } from '../lib/cards.js';
+import { getAllCards, getCard, resolveCardArgument } from '../lib/cards.js';
 import {
   addReview,
   getCardSchedule,
@@ -34,12 +34,12 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
 
   if (cardPath) {
     // Review specific card
-    const card = getCard(cardPath);
+    const { name, card } = resolveCardArgument(cardPath);
     if (!card) {
       console.error(`Card not found: ${cardPath}`);
       process.exit(1);
     }
-    cardsToReview = [card.name];
+    cardsToReview = [name];
   } else {
     // Get all due cards
     const dueCards = getDueCards();
@@ -111,7 +111,7 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
   console.log(`\n--- Card: ${cardName} ---`);
   console.log(card.front);
   console.log('\nPress Enter to see the back, or:');
-  console.log('  e - edit card');
+  console.log('  edit - edit card');
   console.log('  q - quit review session');
 
   const frontResponse = await question(rl, '> ');
@@ -120,7 +120,7 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
     return false;
   }
 
-  if (frontResponse.toLowerCase() === 'e') {
+  if (frontResponse.toLowerCase() === 'edit') {
     await editCard(card.filePath);
     return true;
   }
@@ -133,7 +133,7 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
   console.log('  2/hard  - Remembered with difficulty');
   console.log('  3/medium - Remembered with some effort');
   console.log('  4/easy  - Remembered easily');
-  console.log('  e - edit card');
+  console.log('  edit - edit card');
   console.log('  q - quit review session');
 
   // eslint-disable-next-line no-constant-condition
@@ -144,7 +144,7 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
       return false;
     }
 
-    if (backResponse.toLowerCase() === 'e') {
+    if (backResponse.toLowerCase() === 'edit') {
       await editCard(card.filePath);
       return true;
     }
@@ -171,7 +171,7 @@ async function reviewCard(cardName: string, rl: Interface): Promise<boolean> {
     }
 
     console.log(
-      'Invalid input. Please enter 1-4, again/hard/medium/easy, e, or q.'
+      'Invalid input. Please enter 1-4, again/hard/medium/easy, edit, or q.'
     );
   }
 }

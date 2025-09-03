@@ -70,7 +70,7 @@ During review:
   - `2` or `hard` - Remembered with difficulty  
   - `3` or `medium` - Remembered with some effort
   - `4` or `easy` - Remembered easily
-- Press `e` to edit the current card
+- Type `edit` to edit the current card
 - Press `q` to quit the review session
 
 ### Configuration

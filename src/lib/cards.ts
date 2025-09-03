@@ -14,10 +14,16 @@ export function parseCard(filePath: string): Card | null {
       return null;
     }
 
-    const front = parts[0]?.trim() || '';
+    const frontRaw = parts[0]?.trim() || '';
     const backRaw = parts[1]?.trim() || '';
 
-    // Remove comment lines (starting with %)
+    // Remove comment lines (starting with %) from both front and back
+    const front = frontRaw
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('%'))
+      .join('\n')
+      .trim();
+
     const back = backRaw
       .split('\n')
       .filter((line) => !line.trim().startsWith('%'))
@@ -71,6 +77,39 @@ export function getAllCards(): Card[] {
 export function getCard(cardName: string): Card | null {
   const cards = getAllCards();
   return cards.find((card) => card.name === cardName) || null;
+}
+
+export function getCardByPath(cardPath: string): Card | null {
+  const clinkyHome = getClinkyHome();
+  let fullPath: string;
+
+  // If path is absolute, use it directly
+  if (cardPath.startsWith('/')) {
+    fullPath = cardPath;
+  } else {
+    // Treat as relative to CLINKY_HOME
+    fullPath = join(clinkyHome, cardPath);
+  }
+
+  return parseCard(fullPath);
+}
+
+export function resolveCardArgument(arg: string): {
+  name: string;
+  card: Card | null;
+} {
+  // If argument contains path separators or ends with .txt, treat as path
+  if (arg.includes('/') || arg.includes('\\') || arg.endsWith('.txt')) {
+    const card = getCardByPath(arg);
+    if (card) {
+      return { name: card.name, card };
+    }
+    return { name: basename(arg, extname(arg)), card: null };
+  } else {
+    // Treat as card name
+    const card = getCard(arg);
+    return { name: arg, card };
+  }
 }
 
 export function createCardTemplate(): string {
