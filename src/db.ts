@@ -1,8 +1,12 @@
 import { Database } from 'bun:sqlite';
 import path from 'path';
+import fs from 'fs';
 import { CLINKY_HOME } from './config';
 
 const DB_PATH = path.join(CLINKY_HOME, 'reviews.db');
+
+// Ensure the directory for the database exists before opening it
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 export const db = new Database(DB_PATH);
 

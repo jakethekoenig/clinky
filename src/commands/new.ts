@@ -25,7 +25,7 @@ export const newCard = () => {
   fs.writeFileSync(cardPath, CARD_TEMPLATE);
 
   const proc = spawnSync({
-    cmd: [editor, cardPath],
+    cmd: ['sh', '-c', `${editor} "${cardPath}"`],
     stdio: ['inherit', 'inherit', 'inherit'],
   });
 

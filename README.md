@@ -42,7 +42,7 @@ This will open your default editor (`$EDITOR`, falls back to `vim`) with a templ
 The card format is simple:
 ```
 Front of the card
----split---
+<!---split--->
 Back of the card
 % Lines starting with % are comments and are ignored.
 ```
