@@ -2,7 +2,8 @@ import { createInterface, Interface } from 'readline';
 import { spawn } from 'child_process';
 import { basename } from 'path';
 import { ensureClinkyHome, getConfig } from '../lib/config.js';
-import { getAllCards, getCard, resolveCardArgument } from '../lib/cards.js';
+import { getAllCards, resolveCardArgument } from '../lib/cards.js';
+import type { Card } from '../types.js';
 import {
   addReview,
   getCardSchedule,
@@ -117,7 +118,7 @@ export async function reviewCommand(cardPath?: string): Promise<void> {
 }
 
 async function reviewCard(
-  card: ReturnType<typeof getCard>,
+  card: Card | null,
   rl: Interface
 ): Promise<{ continue: boolean; reviewed: boolean }> {
   if (!card) return { continue: true, reviewed: false };
