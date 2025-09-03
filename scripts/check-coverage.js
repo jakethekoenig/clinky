@@ -21,24 +21,41 @@ function runCoverage() {
 }
 
 function parseSummary(output) {
-  // Expect a table like:
-  // ------------------|---------|----------|---------|---------|-------------------
-  // File              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
-  // All files         |   85.71 |       50 |      50 |   85.71 |
   const lines = output.split("\n");
+  // Try Istanbul-style table first
   const headerIdx = lines.findIndex((l) => l.includes("% Stmts") && l.includes("% Lines"));
-  if (headerIdx === -1) throw new Error("Could not find coverage summary header");
-  const allLine = lines.slice(headerIdx).find((l) => l.trimStart().startsWith("All files"));
-  if (!allLine) throw new Error("Could not find 'All files' coverage summary");
-  const cols = allLine.split("|").map((s) => s.trim());
-  // cols: ["All files", "85.71", "50", "50", "85.71", ...] or with % signs
-  const pct = (s) => parseFloat(String(s).replace("%", "").trim());
-  return {
-    statements: pct(cols[1]),
-    branches: pct(cols[2]),
-    functions: pct(cols[3]),
-    lines: pct(cols[4]),
+  if (headerIdx !== -1) {
+    const allLine = lines.slice(headerIdx).find((l) => l.trimStart().startsWith("All files"));
+    if (allLine) {
+      const cols = allLine.split("|").map((s) => s.trim());
+      const pct = (s) => parseFloat(String(s).replace("%", "").trim());
+      return {
+        statements: pct(cols[1]),
+        branches: pct(cols[2]),
+        functions: pct(cols[3]),
+        lines: pct(cols[4]),
+      };
+    }
+  }
+  // Fallback: parse simple summary lines like "Statements: 85.71% | Branches: 50% | Functions: 50% | Lines: 85.71%"
+  const text = lines.join(" ");
+  const grab = (label) => {
+    const m = new RegExp(`${label}\\s*[:=]\\s*([\\d.]+)%`, "i").exec(text);
+    return m ? parseFloat(m[1]) : undefined;
   };
+  const statements = grab("Statements");
+  const branches = grab("Branches");
+  const functions = grab("Functions");
+  const linesPct = grab("Lines");
+  if (
+    statements === undefined ||
+    branches === undefined ||
+    functions === undefined ||
+    linesPct === undefined
+  ) {
+    throw new Error("Could not parse coverage summary (unsupported output format)");
+  }
+  return { statements, branches, functions, lines: linesPct };
 }
 
 function main() {
