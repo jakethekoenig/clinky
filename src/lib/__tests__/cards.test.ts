@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { mkdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { parseCard, getAllCards, createCardTemplate, resolveCardArgument, getCardByPath } from '../cards';
+import { parseCard, createCardTemplate, resolveCardArgument, getCardByPath } from '../cards';
 
 const testDir = join(process.cwd(), 'test-cards');
 

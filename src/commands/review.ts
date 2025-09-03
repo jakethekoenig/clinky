@@ -1,4 +1,5 @@
-import { createInterface, Interface } from 'readline';
+import { createInterface } from 'readline';
+import type { Interface } from 'readline';
 import { spawn } from 'child_process';
 import { basename } from 'path';
 import { ensureClinkyHome, getConfig } from '../lib/config.js';
