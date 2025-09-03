@@ -1,12 +1,10 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { homedir } from 'os';
 import type { Config } from '../types.js';
 
 export function getClinkyHome(): string {
-  return (
-    process.env.CLINKY_HOME ||
-    join(process.env.HOME || '~', '.config', 'clinky')
-  );
+  return process.env.CLINKY_HOME || join(homedir(), '.config', 'clinky');
 }
 
 export function ensureClinkyHome(): void {
