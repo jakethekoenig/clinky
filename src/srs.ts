@@ -10,6 +10,8 @@ export interface SrsData {
 
 const DEFAULT_EASINESS_FACTOR = 2.5;
 const DEFAULT_INTERVAL = 1;
+// Make brand-new cards immediately reviewable by default and avoid "now" race with getDueCards.
+const DEFAULT_DUE_DATE = new Date(0); // Epoch => always due
 
 export const getSrsData = (cardPath: string): SrsData => {
   const card_name = path.basename(cardPath);
@@ -25,10 +27,10 @@ export const getSrsData = (cardPath: string): SrsData => {
     };
   }
 
-  // Default for new cards
+  // Default for new cards: due immediately
   return {
     card_name,
-    due_date: new Date(),
+    due_date: DEFAULT_DUE_DATE,
     interval: DEFAULT_INTERVAL,
     easiness_factor: DEFAULT_EASINESS_FACTOR,
   };
