@@ -45,7 +45,7 @@ export const updateSrsData = (cardPath: string, score: number) => {
   if (score < 2) { // again - make immediately available for review
     srsData.interval = 1;
     // For "again" cards, make them due immediately (like Anki)
-    srsData.due_date = new Date(now.getTime());
+    srsData.due_date = now;
   } else {
     if (srsData.interval === 1) {
       srsData.interval = 6;
