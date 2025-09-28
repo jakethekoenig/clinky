@@ -11,6 +11,15 @@ A minimalist, command-line spaced repetition tool. `clinky` is designed for deve
 
 ## Installation
 
+Install globally via npm:
+```sh
+npm install -g clinky
+```
+
+### Development Installation
+
+If you want to install from source:
+
 1.  Clone this repository:
     ```sh
     git clone https://github.com/jakethekoenig/clinky.git

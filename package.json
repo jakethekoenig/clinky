@@ -1,9 +1,18 @@
 {
-  "name": "jakethekoenig_clinky",
-  "module": "index.ts",
+  "name": "clinky",
+  "version": "0.1.0",
+  "description": "A minimalist, command-line spaced repetition tool",
+  "main": "src/index.ts",
+  "bin": {
+    "clinky": "src/index.ts"
+  },
   "type": "module",
-  "private": true,
   "license": "MIT",
+  "keywords": ["spaced-repetition", "flashcards", "cli", "learning"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jakethekoenig/clinky.git"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -12,5 +21,8 @@
   },
   "dependencies": {
     "commander": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
