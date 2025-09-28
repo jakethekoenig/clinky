@@ -42,7 +42,7 @@ export const updateSrsData = (cardPath: string, score: number) => {
 
   const now = new Date();
 
-  if (score < 2) { // again - make card available for review soon
+  if (score < 2) { // again - schedule for review in 1 minute
     srsData.interval = 1;
     // For "again" cards, make them due in 1 minute instead of 1 day
     srsData.due_date = new Date(now.getTime() + 1 * 60 * 1000); // 1 minute from now
