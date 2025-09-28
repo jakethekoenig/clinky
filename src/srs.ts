@@ -40,23 +40,26 @@ export const updateSrsData = (cardPath: string, score: number) => {
   const card_name = path.basename(cardPath);
   let srsData = getSrsData(cardPath);
 
-  if (score < 2) { // again
+  const now = new Date();
+
+  if (score < 2) { // again - make card available for review soon
     srsData.interval = 1;
+    // For "again" cards, make them due in 1 minute instead of 1 day
+    srsData.due_date = new Date(now.getTime() + 1 * 60 * 1000); // 1 minute from now
   } else {
     if (srsData.interval === 1) {
       srsData.interval = 6;
     } else {
       srsData.interval = Math.round(srsData.interval * srsData.easiness_factor);
     }
+    // For successful reviews, schedule for the calculated interval in days
+    srsData.due_date = new Date(now.getTime() + srsData.interval * 24 * 60 * 60 * 1000);
   }
 
   srsData.easiness_factor += 0.1 - (3 - score) * (0.08 + (3 - score) * 0.02);
   if (srsData.easiness_factor < 1.3) {
     srsData.easiness_factor = 1.3;
   }
-
-  const now = new Date();
-  srsData.due_date = new Date(now.setDate(now.getDate() + srsData.interval));
 
   const upsertQuery = db.query(`
     INSERT INTO cards (card_name, due_date, interval, easiness_factor)
